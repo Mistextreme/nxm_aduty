@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>NXM Aduty</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="app" class="hidden">
+    <div class="wrapper">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo">
+                    <img id="logoImg" class="logo-img hidden" alt="logo" />
+                    <span id="logoText" class="logo-text">NXM</span>
+                </div>
+                <div class="brand-text">
+                    <h1 id="brandName">Aduty</h1>
+                    <span id="brandSubtitle" class="subtitle">Admin Panel</span>
+                </div>
+            </div>
+
+            <nav class="nav">
+                <button class="nav-btn active" data-view="ranks" id="navRanks">
+                    <span class="nav-icon">👕</span>
+                    <span class="nav-label" data-i18n="ui_nav_ranks">Ranks</span>
+                </button>
+                <button class="nav-btn" data-view="list" id="navList">
+                    <span class="nav-icon">👥</span>
+                    <span class="nav-label" data-i18n="ui_nav_list">Active</span>
+                    <span class="badge" id="listBadge">0</span>
+                </button>
+                <button class="nav-btn" data-view="logs" id="navLogs">
+                    <span class="nav-icon">📜</span>
+                    <span class="nav-label" data-i18n="ui_nav_logs">Logs</span>
+                </button>
+            </nav>
+
+            <!-- View: Ranks Sidebar -->
+            <div id="sideRanks" class="side-view">
+                <div class="search">
+                    <span class="search-icon">🔍</span>
+                    <input id="search" type="text" data-i18n-ph="ui_search_rank" placeholder="Search rank…" />
+                </div>
+                <div id="rankList" class="rank-list"></div>
+                <div class="sidebar-foot">
+                    <button class="btn-primary block" id="btnAdd" data-i18n="ui_btn_new_rank">＋ New Rank</button>
+                    <button class="btn-ghost block" id="btnClose" data-i18n="ui_btn_close">Close (ESC)</button>
+                </div>
+            </div>
+
+            <!-- View: List Sidebar -->
+            <div id="sideList" class="side-view hidden">
+                <div class="search">
+                    <span class="search-icon">🔍</span>
+                    <input id="listSearch" type="text" data-i18n-ph="ui_search_player" placeholder="Search player…" />
+                </div>
+                <div class="sidebar-foot">
+                    <button class="btn-secondary block" id="btnListRefresh" data-i18n="ui_btn_refresh">↻ Refresh</button>
+                    <button class="btn-ghost block" id="btnClose3" data-i18n="ui_btn_close">Close (ESC)</button>
+                </div>
+            </div>
+
+            <!-- View: Logs Sidebar -->
+            <div id="sideLogs" class="side-view hidden">
+                <div class="search">
+                    <span class="search-icon">🔍</span>
+                    <input id="logSearch" type="text" data-i18n-ph="ui_search_log" placeholder="Name / ID / Action…" />
+                </div>
+                <div class="sidebar-foot">
+                    <button class="btn-secondary block" id="btnLogRefresh" data-i18n="ui_btn_refresh">↻ Refresh</button>
+                    <button class="btn-ghost block" id="btnClose2" data-i18n="ui_btn_close">Close (ESC)</button>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content">
+            <!-- Empty (Ranks) -->
+            <div id="empty" class="empty">
+                <div class="empty-icon">👕</div>
+                <h2 data-i18n="ui_empty_title">No rank selected</h2>
+                <p data-i18n="ui_empty_text">Pick a rank on the left or create a new one.</p>
+            </div>
+
+            <!-- Editor (Ranks) -->
+            <div id="editor" class="editor hidden">
+                <header class="editor-head">
+                    <div class="form-row">
+                        <div class="field">
+                            <label>
+                                <span data-i18n="ui_field_rank_key">Rank-Key</span>
+                                <span class="hint" data-i18n="ui_field_rank_key_hint">(ACE: staff.aduty.&lt;key&gt;)</span>
+                            </label>
+                            <input id="rankKey" type="text" data-i18n-ph="ui_field_rank_key_ph" placeholder="e.g. moderator" />
+                        </div>
+                        <div class="field">
+                            <label data-i18n="ui_field_label">Display Name</label>
+                            <input id="rankLabel" type="text" data-i18n-ph="ui_field_label_ph" placeholder="e.g. Moderator" />
+                        </div>
+                        <div class="field small">
+                            <label data-i18n="ui_field_priority">Priority</label>
+                            <input id="rankPriority" type="number" value="100" />
+                        </div>
+                    </div>
+                </header>
+
+                <section class="settings-box">
+                    <div class="settings-grid">
+                        <label class="check">
+                            <input type="checkbox" id="setGod" />
+                            <span data-i18n="ui_setting_god">God-Mode</span>
+                        </label>
+                        <label class="check">
+                            <input type="checkbox" id="setHeal" />
+                            <span data-i18n="ui_setting_heal">Auto-Heal</span>
+                        </label>
+                        <label class="check">
+                            <input type="checkbox" id="setArmor" />
+                            <span data-i18n="ui_setting_armor">Auto-Armor</span>
+                        </label>
+                        <div class="inline">
+                            <label data-i18n="ui_setting_blip_color">Blip Color</label>
+                            <input id="setBlipColor" type="number" min="0" max="85" value="3" />
+                            <span class="color-dot" id="colorDot"></span>
+                        </div>
+                        <div class="inline">
+                            <label data-i18n="ui_setting_blip_sprite">Blip Icon</label>
+                            <input id="setBlipSprite" type="number" min="1" max="826" value="1" />
+                        </div>
+                    </div>
+                </section>
+
+                <div class="tabs">
+                    <div class="tab-group">
+                        <button class="tab active" data-sex="male"   data-i18n="ui_tab_male">♂ Male</button>
+                        <button class="tab"        data-sex="female" data-i18n="ui_tab_female">♀ Female</button>
+                    </div>
+                    <div class="tab-actions">
+                        <button class="btn-secondary" id="btnImport"       data-i18n="ui_btn_import"        data-i18n-title="ui_btn_import_tip">📥 Import Current</button>
+                        <button class="btn-secondary" id="btnCopy"         data-i18n="ui_btn_copy"          data-i18n-title="ui_btn_copy_tip">↔ Mirror</button>
+                        <button class="btn-secondary" id="btnPreview"      data-i18n="ui_btn_preview"       data-i18n-title="ui_btn_preview_tip">👁 Live</button>
+                        <button class="btn-secondary" id="btnPreviewReset" data-i18n="ui_btn_preview_reset" data-i18n-title="ui_btn_preview_reset_tip">↺</button>
+                        <button class="btn-primary"   id="btn3D"           data-i18n="ui_btn_3d"            data-i18n-title="ui_btn_3d_tip">🎬 3D Preview</button>
+                    </div>
+                </div>
+
+                <div id="fields" class="fields"></div>
+
+                <footer class="editor-foot">
+                    <button class="btn-danger" id="btnDelete" data-i18n="ui_btn_delete">🗑 Delete</button>
+                    <div class="spacer"></div>
+                    <button class="btn-primary" id="btnSave" data-i18n="ui_btn_save">💾 Save</button>
+                </footer>
+            </div>
+
+            <!-- Active List View -->
+            <div id="listView" class="listview hidden">
+                <header class="view-head">
+                    <h2 data-i18n="ui_list_title">👥 Active Aduty Players</h2>
+                    <span class="muted" id="listCount">0 active</span>
+                </header>
+                <div id="listTable" class="player-grid"></div>
+            </div>
+
+            <!-- Logs View -->
+            <div id="logs" class="logs hidden">
+                <header class="view-head">
+                    <h2 data-i18n="ui_logs_title">📜 Activity Logs</h2>
+                    <span class="muted" id="logCount">0 entries</span>
+                </header>
+                <div id="logTable" class="log-table"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 3D Preview Overlay -->
+    <div id="preview3D" class="preview-overlay hidden">
+        <div class="preview-top">
+            <h3 id="previewTitle" data-i18n="ui_3d_title">3D Preview</h3>
+            <div class="preview-hint">
+                <span data-i18n="ui_3d_hint_drag">🖱 LMB drag: rotate</span>
+                <span data-i18n="ui_3d_hint_zoom">🖲 Wheel: zoom</span>
+                <span data-i18n="ui_3d_hint_esc">ESC: close</span>
+            </div>
+        </div>
+        <div class="preview-bottom">
+            <div class="preview-tabgroup">
+                <button class="tab active" data-sex="male">♂</button>
+                <button class="tab" data-sex="female">♀</button>
+            </div>
+            <button class="btn-primary" id="btn3DClose" data-i18n="ui_3d_btn_close">✕ Close</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Confirm Modal -->
+    <div id="confirm" class="modal hidden">
+        <div class="modal-box">
+            <h3 id="confirmTitle" data-i18n="ui_confirm_title">Confirm</h3>
+            <p id="confirmText" data-i18n="ui_confirm_text">Are you sure?</p>
+            <div class="modal-actions">
+                <button class="btn-ghost"  id="confirmCancel" data-i18n="ui_confirm_cancel">Cancel</button>
+                <button class="btn-danger" id="confirmOk"     data-i18n="ui_confirm_ok">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
